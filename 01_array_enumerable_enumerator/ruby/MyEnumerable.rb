@@ -27,7 +27,10 @@ module MyEnumerable
 	#
 	## &{E -> boolean} -> boolean
 	def all?
-		raise NotImplementedError
+		each do |e|
+			return false unless yield e
+		end
+		true
 	end
 
 	#
@@ -44,7 +47,10 @@ module MyEnumerable
 	#
 	## &{E -> boolean} -> boolean
 	def any?
-		raise NotImplementedError
+		each do |e|
+			return true if yield e
+		end
+		false
 	end
 
 	#
@@ -60,7 +66,11 @@ module MyEnumerable
 	#
 	## &{E -> boolean} -> Integer
 	def count
-		raise NotImplementedError
+		c = 0
+		each do |e|
+			c += 1 if yield e
+		end
+		c
 	end
 
 	#
@@ -77,7 +87,9 @@ module MyEnumerable
 	#
 	## &{E -> boolean} -> E?
 	def find
-		raise NotImplementedError
+		each do |e|
+			return e if yield e
+		end
 	end
 
 	#
@@ -94,7 +106,11 @@ module MyEnumerable
 	#
 	## &{E -> boolean} -> Integer?
 	def find_index
-		raise NotImplementedError
+		i = 0
+		each do |e|
+			return i if yield e
+			i += 1
+		end
 	end
 
 	#
@@ -111,7 +127,9 @@ module MyEnumerable
 	#
 	## -> E?
 	def first
-		raise NotImplementedError
+		each do |e|
+			return e # Return on first element.
+		end
 	end
 
 	#
@@ -127,7 +145,11 @@ module MyEnumerable
 	#
 	## <T: ..Object?> &{E -> T} -> MyArray<T>
 	def map
-		raise NotImplementedError
+		mapped = self.class.new
+		each do |e|
+			mapped.push yield(e)
+		end
+		mapped
 	end
 
 	#
@@ -143,7 +165,11 @@ module MyEnumerable
 	#
 	## &{E -> boolean} -> MyArray<E>
 	def reject
-		raise NotImplementedError
+		rejected = self.class.new
+		each do |e|
+			rejected.push(e) unless yield e
+		end
+		rejected
 	end
 
 	#
@@ -159,6 +185,10 @@ module MyEnumerable
 	#
 	## &{E -> boolean} -> MyArray<E>
 	def select
-		raise NotImplementedError
+		selected = self.class.new
+		each do |e|
+			selected.push(e) if yield e
+		end
+		selected
 	end
 end

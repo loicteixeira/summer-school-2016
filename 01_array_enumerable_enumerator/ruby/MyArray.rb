@@ -182,7 +182,9 @@ class MyArray
 	#
 	## Integer -> E?
 	def [](i)
-		raise NotImplementedError
+		return if i.abs > @n or i >= @n # Out of bounds.
+		i += @n if i < 0 # Wraps index around, could use % but more expensive?
+		@m[i]
 	end
 
 	#
@@ -203,7 +205,9 @@ class MyArray
 	#
 	## Integer, E -> void
 	def []=(i, e)
-		raise NotImplementedError
+		raise IndexError if i.abs > @n or i >= @n # Out of bounds.
+		i += @n if i < 0 # Wraps index around, could use % but more expensive?
+		@m[i] = e
 	end
 
 	#
@@ -221,7 +225,11 @@ class MyArray
 	#
 	## -> E?
 	def pop
-		raise NotImplementedError
+		return if @n < 1
+		e = @m[@n-1] # Get last element.
+		@m[@n-1] = nil # Erase last element.
+		@n -= 1 # Reduce size.
+		e
 	end
 
 	#
@@ -238,7 +246,10 @@ class MyArray
 	#
 	## E -> void
 	def push(e)
-		raise NotImplementedError
+		__ensure_capacity(@n + 1)
+		@m[@n] = e
+		@n += 1
+		nil
 	end
 
 	#
@@ -256,7 +267,13 @@ class MyArray
 	#
 	## -> E?
 	def shift
-		raise NotImplementedError
+		return if @n < 1
+		e = @m[0]
+		@n -= 1
+		@n.times do |i|
+			@m[i] = @m[i + 1]
+		end
+		e
 	end
 
 	#
@@ -273,7 +290,12 @@ class MyArray
 	#
 	## E -> void
 	def unshift(e)
-		raise NotImplementedError
+		__ensure_capacity(@n + 1)
+		@n.downto(1) do |i|
+			@m[i] = @m[i-1]
+		end
+		@m[0] = e
+		@n += 1
 	end
 
 	#
@@ -327,7 +349,8 @@ class MyArray
 		#
 		## -> E
 		def peek
-			raise NotImplementedError
+			raise StopIteration if @i >= @a.size
+			@a[@i]
 		end
 
 		#
@@ -348,7 +371,9 @@ class MyArray
 		#
 		## -> E
 		def next
-			raise NotImplementedError
+			element = peek
+			@i += 1
+			element
 		end
 	end
 

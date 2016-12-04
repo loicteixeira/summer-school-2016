@@ -49,6 +49,11 @@ class MyEnumerator
 	#
 	## &{E -> void} -> void
 	def each
-		raise NotImplementedError
+		e = to_enum
+		loop do
+			yield e.next
+		end
+	rescue StopIteration
+		return
 	end
 end
