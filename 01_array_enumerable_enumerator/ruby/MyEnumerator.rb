@@ -49,11 +49,14 @@ class MyEnumerator
 	#
 	## &{E -> void} -> void
 	def each
-		e = to_enum
-		loop do
-			yield e.next
+		enum = to_enum # Make sure each starts from the begining
+		while true
+			begin
+				e = enum.next
+			rescue StopIteration
+				return
+			end
+			yield e
 		end
-	rescue StopIteration
-		return
 	end
 end

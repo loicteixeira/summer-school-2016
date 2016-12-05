@@ -182,9 +182,15 @@ class MyArray
 	#
 	## Integer -> E?
 	def [](i)
-		return if i.abs > @n or i >= @n # Out of bounds.
-		i += @n if i < 0 # Wraps index around, could use % but more expensive?
-		@m[i]
+		if i < 0
+			i += @n
+			if i < 0
+				return nil
+			end
+		elsif i >= @n
+			return nil
+		end
+		return @m[i]
 	end
 
 	#
@@ -205,8 +211,14 @@ class MyArray
 	#
 	## Integer, E -> void
 	def []=(i, e)
-		raise IndexError if i.abs > @n or i >= @n # Out of bounds.
-		i += @n if i < 0 # Wraps index around, could use % but more expensive?
+		if i < 0
+			i += @n
+			if i < 0
+				raise IndexError
+			end
+		elsif i >= @n
+			raise IndexError
+		end
 		@m[i] = e
 	end
 
@@ -225,11 +237,16 @@ class MyArray
 	#
 	## -> E?
 	def pop
-		return if @n < 1
-		e = @m[@n-1] # Get last element.
-		@m[@n-1] = nil # Erase last element.
-		@n -= 1 # Reduce size.
-		e
+		if empty?
+			return nil
+		end
+
+		e = @m[@n - 1]
+
+		@m[@n - 1] = nil
+		@n -= 1
+
+		return e
 	end
 
 	#
@@ -246,10 +263,11 @@ class MyArray
 	#
 	## E -> void
 	def push(e)
-		__ensure_capacity(@n + 1)
+		n = @n + 1
+		__ensure_capacity(n)
 		@m[@n] = e
-		@n += 1
-		nil
+		@n = n
+		return
 	end
 
 	#
@@ -267,13 +285,20 @@ class MyArray
 	#
 	## -> E?
 	def shift
-		return if @n < 1
+		if empty?
+			return nil
+		end
+
 		e = @m[0]
+
 		@n -= 1
 		@n.times do |i|
 			@m[i] = @m[i + 1]
 		end
-		e
+
+		@m[@n] = nil
+
+		return e
 	end
 
 	#
@@ -290,12 +315,17 @@ class MyArray
 	#
 	## E -> void
 	def unshift(e)
-		__ensure_capacity(@n + 1)
-		@n.downto(1) do |i|
-			@m[i] = @m[i-1]
+		n = @n + 1
+		__ensure_capacity(n)
+
+		@n.times do |i|
+			@m[@n - i] = @m[@n - i - 1]
 		end
+
 		@m[0] = e
 		@n += 1
+
+		return
 	end
 
 	#
@@ -349,8 +379,10 @@ class MyArray
 		#
 		## -> E
 		def peek
-			raise StopIteration if @i >= @a.size
-			@a[@i]
+			if @i >= @a.size
+				raise StopIteration
+			end
+			return @a.__get(@i)
 		end
 
 		#
@@ -371,9 +403,9 @@ class MyArray
 		#
 		## -> E
 		def next
-			element = peek
+			e = peek
 			@i += 1
-			element
+			return e
 		end
 	end
 
