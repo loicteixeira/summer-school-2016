@@ -182,7 +182,8 @@ class CircularBuffer
 	#
 	## -> E?
 	def first
-		raise NotImplementedError
+		return if empty?
+		@m[@i]
 	end
 
 	#
@@ -199,7 +200,9 @@ class CircularBuffer
 	#
 	## -> E?
 	def last
-		raise NotImplementedError
+		return if empty?
+		i = __ensure_in_bounds(@j - 1)
+		@m[i]
 	end
 
 	#
@@ -217,7 +220,12 @@ class CircularBuffer
 	#
 	## -> E?
 	def pop
-		raise NotImplementedError
+		return if empty?
+		@j = __ensure_in_bounds(@j - 1)
+		e = last
+		@m[@j] = nil
+		@n -= 1
+		e
 	end
 
 	#
@@ -234,7 +242,10 @@ class CircularBuffer
 	#
 	## E -> void
 	def push(e)
-		raise NotImplementedError
+		raise IndexError if full?
+		@m[@j] = e
+		@j += 1
+		@n += 1
 	end
 
 	#
@@ -252,7 +263,12 @@ class CircularBuffer
 	#
 	## -> E?
 	def shift
-		raise NotImplementedError
+		return if empty?
+		e = first
+		@m[@i] = nil
+		@i = __ensure_in_bounds(@i + 1)
+		@n -= 1
+		e
 	end
 
 	#
@@ -269,6 +285,19 @@ class CircularBuffer
 	#
 	## E -> void
 	def unshift(e)
-		raise NotImplementedError
+		raise IndexError if full?
+		@i = __ensure_in_bounds(@i - 1)
+		@m[@i] = e
+		@n += 1
+	end
+
+	def __ensure_in_bounds(v)
+		if v < 0
+			return v + @m.capacity
+		elsif v >= @m.capacity
+			return v - @m.capacity
+		else
+			return v
+		end
 	end
 end

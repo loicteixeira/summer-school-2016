@@ -100,6 +100,26 @@ describe "SinglyLinkedList#empty?" do
 	end
 end
 
+describe "SinglyLinkedList#first" do
+	it "should return `nil` for a new list" do
+		l = SinglyLinkedList.new
+		e = l.first
+		expect(e).to eql(nil)
+	end
+
+	it "should return `nil` for a list of no elements" do
+		l = SinglyLinkedList[]
+		e = l.first
+		expect(e).to eql(nil)
+	end
+
+	it "should return the first element for a list of two elements" do
+		l = SinglyLinkedList[3, 5]
+		e = l.first
+		expect(e).to eql(3)
+	end
+end
+
 describe "SinglyLinkedList#shift" do
 	it "should return `nil` for new list" do
 		l = SinglyLinkedList.new

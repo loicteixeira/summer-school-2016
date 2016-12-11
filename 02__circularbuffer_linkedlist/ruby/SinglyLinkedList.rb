@@ -192,7 +192,8 @@ class SinglyLinkedList
 	#
 	## -> E?
 	def first
-		raise NotImplementedError
+		return if empty?
+		@head_node.e
 	end
 
 	#
@@ -210,7 +211,11 @@ class SinglyLinkedList
 	#
 	## -> E?
 	def shift
-		raise NotImplementedError
+		return if empty?
+		node = @head_node
+		@head_node = node.tail_node
+		@n -= 1
+		node.e
 	end
 
 	#
@@ -226,6 +231,8 @@ class SinglyLinkedList
 	#
 	## E -> void
 	def unshift(e)
-		raise NotImplementedError
+		node = Node.new(e, @head_node)
+		@head_node = node
+		@n += 1
 	end
 end

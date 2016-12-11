@@ -100,6 +100,46 @@ describe "DoublyLinkedList#empty?" do
 	end
 end
 
+describe "DoublyLinkedList#first" do
+	it "should return `nil` for a new list" do
+		l = DoublyLinkedList.new
+		e = l.first
+		expect(e).to eql(nil)
+	end
+
+	it "should return `nil` for a list of no elements" do
+		l = DoublyLinkedList[]
+		e = l.first
+		expect(e).to eql(nil)
+	end
+
+	it "should return the first element for a list of two elements" do
+		l = DoublyLinkedList[3, 5]
+		e = l.first
+		expect(e).to eql(3)
+	end
+end
+
+describe "DoublyLinkedList#last" do
+	it "should return `nil` for a new list" do
+		l = DoublyLinkedList.new
+		e = l.last
+		expect(e).to eql(nil)
+	end
+
+	it "should return `nil` for a list of no elements" do
+		l = DoublyLinkedList[]
+		e = l.last
+		expect(e).to eql(nil)
+	end
+
+	it "should return the last element for a list of two elements" do
+		l = DoublyLinkedList[3, 5]
+		e = l.last
+		expect(e).to eql(5)
+	end
+end
+
 describe "DoublyLinkedList#pop" do
 	it "should return `nil` for new list" do
 		l = DoublyLinkedList.new

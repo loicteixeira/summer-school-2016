@@ -209,7 +209,8 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def first
-		raise NotImplementedError
+		return if empty?
+		@first_node.e
 	end
 
 	#
@@ -226,7 +227,8 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def last
-		raise NotImplementedError
+		return if empty?
+		@last_node.e
 	end
 
 	#
@@ -244,7 +246,11 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def pop
-		raise NotImplementedError
+		return if empty?
+		node = @last_node
+		@last_node = node.prev_node
+		@n -= 1
+		node.e
 	end
 
 	#
@@ -260,7 +266,17 @@ class DoublyLinkedList
 	#
 	## E -> void
 	def push(e)
-		raise NotImplementedError
+		node = Node.new(e)
+
+		node.prev_node = @last_node
+		if empty?
+			@first_node = node
+		else
+			@last_node.next_node = node
+		end
+		@last_node = node
+
+		@n += 1
 	end
 
 	#
@@ -278,7 +294,12 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def shift
-		raise NotImplementedError
+		return if empty?
+		node = @first_node
+		@first_node = node.next_node
+		@first_node.prev_node = self
+		@n -= 1
+		node.e
 	end
 
 	#
@@ -294,6 +315,14 @@ class DoublyLinkedList
 	#
 	## E -> void
 	def unshift(e)
-		raise NotImplementedError
+		node = Node.new(e)
+
+		unless empty?
+			@first_node.prev_node
+			node.next_node = @first_node
+		end
+
+		@first_node = node
+		@n += 1
 	end
 end

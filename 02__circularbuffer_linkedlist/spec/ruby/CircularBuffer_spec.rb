@@ -100,6 +100,34 @@ describe "CircularBuffer#empty?" do
 	end
 end
 
+describe "CircularBuffer#first" do
+	it "should return `nil` for empty buffer" do
+		a = CircularBuffer.new(1)
+		e = a.first
+		expect(e).to eql(nil)
+	end
+
+	it "should return the first element for butter of two elements" do
+		a = CircularBuffer[3, 5]
+		e = a.first
+		expect(e).to eql(3)
+	end
+end
+
+describe "CircularBuffer#last" do
+	it "should return `nil` for empty buffer" do
+		a = CircularBuffer.new(1)
+		e = a.last
+		expect(e).to eql(nil)
+	end
+
+	it "should return the last element for butter of two elements" do
+		a = CircularBuffer[3, 5]
+		e = a.last
+		expect(e).to eql(5)
+	end
+end
+
 describe "CircularBuffer#pop" do
 	it "should return `nil` for new buffer" do
 		a = CircularBuffer.new(1)
