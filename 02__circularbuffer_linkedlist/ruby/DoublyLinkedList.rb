@@ -209,8 +209,11 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def first
-		return if empty?
-		@first_node.e
+		node = @first_node
+		if node.nil?
+			return nil
+		end
+		return node.e
 	end
 
 	#
@@ -227,8 +230,11 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def last
-		return if empty?
-		@last_node.e
+		node = @last_node
+		if node.nil?
+			return nil
+		end
+		return node.e
 	end
 
 	#
@@ -246,11 +252,19 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def pop
-		return if empty?
 		node = @last_node
-		@last_node = node.prev_node
+		if node.nil?
+			return nil
+		end
 		@n -= 1
-		node.e
+		prev_node = node.prev_node
+		if prev_node.nil?
+			@first_node = node.next_node
+		else
+			prev_node.next_node = nil
+		end
+		@last_node = prev_node
+		return node.e
 	end
 
 	#
@@ -267,16 +281,16 @@ class DoublyLinkedList
 	## E -> void
 	def push(e)
 		node = Node.new(e)
-
-		node.prev_node = @last_node
-		if empty?
+		prev_node = @last_node
+		if prev_node.nil?
 			@first_node = node
 		else
-			@last_node.next_node = node
+			prev_node.next_node = node
+			node.prev_node = prev_node
 		end
 		@last_node = node
-
 		@n += 1
+		return
 	end
 
 	#
@@ -294,12 +308,19 @@ class DoublyLinkedList
 	#
 	## -> E?
 	def shift
-		return if empty?
 		node = @first_node
-		@first_node = node.next_node
-		@first_node.prev_node = self
+		if node.nil?
+			return nil
+		end
 		@n -= 1
-		node.e
+		next_node = node.next_node
+		if next_node.nil?
+			@last_node = node.prev_node
+		else
+			next_node.prev_node = nil
+		end
+		@first_node = next_node
+		return node.e
 	end
 
 	#
@@ -316,13 +337,15 @@ class DoublyLinkedList
 	## E -> void
 	def unshift(e)
 		node = Node.new(e)
-
-		unless empty?
-			@first_node.prev_node
-			node.next_node = @first_node
+		next_node = @first_node
+		if next_node.nil?
+			@last_node = node
+		else
+			next_node.prev_node = node
+			node.next_node = next_node
 		end
-
 		@first_node = node
 		@n += 1
+		return
 	end
 end

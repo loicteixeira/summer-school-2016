@@ -192,8 +192,11 @@ class SinglyLinkedList
 	#
 	## -> E?
 	def first
-		return if empty?
-		@head_node.e
+		node = @head_node
+		if node.nil?
+			return nil
+		end
+		return node.e
 	end
 
 	#
@@ -211,11 +214,13 @@ class SinglyLinkedList
 	#
 	## -> E?
 	def shift
-		return if empty?
 		node = @head_node
-		@head_node = node.tail_node
+		if node.nil?
+			return nil
+		end
 		@n -= 1
-		node.e
+		@head_node = node.tail_node
+		return node.e
 	end
 
 	#
@@ -234,5 +239,6 @@ class SinglyLinkedList
 		node = Node.new(e, @head_node)
 		@head_node = node
 		@n += 1
+		return
 	end
 end
