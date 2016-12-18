@@ -214,7 +214,13 @@ class MyHash
 	#
 	## ..Object? -> boolean
 	def key?(o)
-		raise NotImplementedError
+		i = o % @m.capacity
+		node = @m[i]
+		until node.nil?
+			return true if node.k == o
+			node = node.tail_node
+		end
+		false
 	end
 
 	#
@@ -230,7 +236,14 @@ class MyHash
 	#
 	## ..Object? -> boolean
 	def value?(o)
-		raise NotImplementedError
+		@m.capacity.times do |i|
+			node = @m[i]
+			until node.nil?
+				return true if node.v == o
+				node = node.tail_node
+			end
+		end
+		return false
 	end
 
 	#
@@ -247,7 +260,13 @@ class MyHash
 	#
 	## ..Object? -> V?
 	def [](o)
-		raise NotImplementedError
+		i = o % @m.capacity
+		node = @m[i]
+		until node.nil?
+			return node.v if node.k == o
+			node = node.tail_node
+		end
+		return
 	end
 
 	#
@@ -263,7 +282,16 @@ class MyHash
 	#
 	## K, V -> void
 	def []=(k, v)
-		raise NotImplementedError
+		node = __get(k)
+		unless node.nil?
+			node.v = v
+			return
+		end
+
+		i = k % @m.capacity
+		node = Node.new(k, v, @m[i])
+		@m[i] = node
+		@n += 1
 	end
 
 	#
@@ -281,6 +309,22 @@ class MyHash
 	#
 	## ..Object? -> V?
 	def delete(o)
-		raise NotImplementedError
+		i = o % @m.capacity
+
+		previous_node = nil
+		current_node = @m[i]
+		until current_node.nil?
+			if current_node.k == o
+				if previous_node
+					previous_node.tail_node = current_node.tail_node
+				else
+					@m[i] = current_node.tail_node
+				end
+				@n -= 1
+				return current_node.v
+			end
+			previous_node = current_node
+			current_node = current_node.tail_node
+		end
 	end
 end
