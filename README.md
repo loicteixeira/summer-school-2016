@@ -14,3 +14,8 @@ Summer School is a course in algorithms and data structures. The course is run v
   - [Implementation](../../compare/a02-src...a02-impl)
   - [Correction](../../compare/a02-src...a02-corr)
   - [Diff](../../compare/a02-impl...a02-corr) between my implementation and the correction
+3. Hash
+  - [Source](../../commit/a03-src)
+  - [Implementation](../../compare/a03-src...a03-impl)
+  - [Correction](../../compare/a03-src...a03-corr)
+  - [Diff](../../compare/a03-impl...a03-corr) between my implementation and the correction
