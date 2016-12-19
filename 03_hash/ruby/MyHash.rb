@@ -214,13 +214,8 @@ class MyHash
 	#
 	## ..Object? -> boolean
 	def key?(o)
-		i = o % @m.capacity
-		node = @m[i]
-		until node.nil?
-			return true if node.k == o
-			node = node.tail_node
-		end
-		false
+		node = __get(o)
+		return !node.nil?
 	end
 
 	#
@@ -236,11 +231,9 @@ class MyHash
 	#
 	## ..Object? -> boolean
 	def value?(o)
-		@m.capacity.times do |i|
-			node = @m[i]
-			until node.nil?
-				return true if node.v == o
-				node = node.tail_node
+		each do |k, v|
+			if v.eql?(o)
+				return true
 			end
 		end
 		return false
@@ -260,13 +253,11 @@ class MyHash
 	#
 	## ..Object? -> V?
 	def [](o)
-		i = o % @m.capacity
-		node = @m[i]
-		until node.nil?
-			return node.v if node.k == o
-			node = node.tail_node
+		node = __get(o)
+		unless node.nil?
+			return node.v
 		end
-		return
+		return nil
 	end
 
 	#
@@ -287,11 +278,11 @@ class MyHash
 			node.v = v
 			return
 		end
-
-		i = k % @m.capacity
-		node = Node.new(k, v, @m[i])
-		@m[i] = node
 		@n += 1
+		x = k.hash
+		i = x % @m.capacity
+		@m[i] = Node.new(k, v, @m[i])
+        return
 	end
 
 	#
@@ -309,22 +300,27 @@ class MyHash
 	#
 	## ..Object? -> V?
 	def delete(o)
-		i = o % @m.capacity
-
-		previous_node = nil
-		current_node = @m[i]
-		until current_node.nil?
-			if current_node.k == o
-				if previous_node
-					previous_node.tail_node = current_node.tail_node
-				else
-					@m[i] = current_node.tail_node
-				end
+		x = o.hash
+		i = x % @m.capacity
+		node = @m[i]
+		unless node.nil?
+			if node.k.eql?(o)
 				@n -= 1
-				return current_node.v
+				@m[i] = node.tail_node
+				return node.v
 			end
-			previous_node = current_node
-			current_node = current_node.tail_node
+			prev_node = node
+			node = node.tail_node
+			until node.nil?
+				if node.k.eql?(o)
+					@n -= 1
+					prev_node.tail_node = node.tail_node
+					return node.v
+				end
+				prev_node = node
+				node = node.tail_node
+			end
 		end
+		return nil
 	end
 end
