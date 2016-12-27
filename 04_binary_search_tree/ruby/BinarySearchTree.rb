@@ -151,7 +151,42 @@ class BinarySearchTree
 			#
 			## <E: ..Comparable<*/E>> Node<E> -> Node<E>?
 			def replace(deleted_node)
-				raise NotImplementedError
+				# Without left_node
+				if deleted_node.left_node.nil?
+					return deleted_node.right_node # Might be nil if no right_node
+
+				# With left_node
+				else
+					# left_node without right_node
+					if deleted_node.left_node.right_node.nil?
+						deleted_node.left_node.right_node = deleted_node.right_node
+						return deleted_node.left_node
+
+					# left_node with right_node
+					else
+						# left_node with right_node without right_node
+						if deleted_node.left_node.right_node.right_node.nil?
+							node = Node.new(deleted_node.left_node.right_node.e) {
+								left(deleted_node.left_node.e) { right(deleted_node.left_node.right_node.left_node.e)} # Should test `deleted_node.left_node.right_node.left_node.nil?` before accessing `e`
+								right(deleted_node.right_node.e) # Should test `deleted_node.right_node.nil?` before accessing `e`
+							}
+							return node
+
+						# left_node with right_node with right_node
+						else
+							node = Node.new(deleted_node.left_node.right_node.right_node.e) {
+								left(deleted_node.left_node.e) {
+									right(deleted_node.left_node.right_node.e) {
+										right(deleted_node.left_node.right_node.right_node.left_node.e) # Should test `deleted_node.left_node.right_node.right_node.left_node.nil?` before accessing `e`
+									}
+								}
+								right(deleted_node.right_node.e) # Should test `deleted_node.right_node.nil?` before accessing `e`
+							}
+							return node
+
+						end
+					end
+				end
 			end
 		end
 	end
@@ -249,7 +284,31 @@ class BinarySearchTree
 	#
 	## E -> void
 	def add(e)
-		raise NotImplementedError
+		unless @root_node
+			@root_node = Node.new(e)
+			return
+		end
+
+		node = @root_node
+		loop do
+			if e < node.e
+				if node.left_node
+					node = node.left_node
+				else
+					node.left_node = Node.new(e)
+					return
+				end
+			elsif e > node.e
+				if node.right_node
+					node = node.right_node
+				else
+					node.right_node = Node.new(e)
+					return
+				end
+			else
+				# Do nothing, `e` already exists.
+			end
+		end
 	end
 
 	#
@@ -265,7 +324,38 @@ class BinarySearchTree
 	#
 	## E -> void
 	def delete(e)
-		raise NotImplementedError
+		return if @root_node.nil?
+
+		if e.eql? @root_node.e
+			@root_node = Util::replace(@root_node)
+			return
+		end
+
+		node = @root_node
+		loop do
+			if e < node.e
+				left_node = node.left_node
+				return if left_node.nil?
+
+				if e.eql? left_node.e
+					node.left_node = Util::replace(left_node)
+					return
+				end
+
+				node = left_node
+
+			elsif e > node.e
+				right_node = node.right_node
+				return if right_node.nil?
+
+				if e.eql? right_node.e
+					node.right_node = Util::replace(right_node)
+					return
+				end
+
+				node = right_node
+			end
+		end
 	end
 
 	#
@@ -281,6 +371,16 @@ class BinarySearchTree
 	#
 	## E -> boolean
 	def member?(e)
-		raise NotImplementedError
+		node = @root_node
+		while node
+			if e.eql?(node.e)
+				return true
+			elsif e < node.e
+				node = node.left_node
+			else
+				node = node.right_node
+			end
+		end
+		return false
 	end
 end
