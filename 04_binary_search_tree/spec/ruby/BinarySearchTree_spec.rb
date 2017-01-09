@@ -142,6 +142,61 @@ describe "BinarySearchTree#delete" do
 	end
 end
 
+describe "BinarySearchTree#delete_min" do
+	it "should return `nil` for new tree" do
+		t = BinarySearchTree.new
+		e = t.delete_min
+		expect(e).to eql(nil)
+	end
+
+	it "should remove root node" do
+		t = BinarySearchTree.root(3) { right(5) }
+		e = t.delete_min
+		expect(t).to eql(BinarySearchTree.root(5))
+		expect(e).to eql(3)
+	end
+
+	it "should remove left node" do
+		t = BinarySearchTree.root(5) { left(2) { right(3) } }
+		e = t.delete_min
+		expect(t).to eql(BinarySearchTree.root(5) { left(3) })
+		expect(e).to eql(2)
+	end
+
+	it "should remove left node of left node" do
+		t = BinarySearchTree.root(7) { left(5) { left(2) { right(3) } } }
+		e = t.delete_min
+		expect(t).to eql(BinarySearchTree.root(7) { left(5) { left(3) } })
+		expect(e).to eql(2)
+	end
+end
+
+describe "BinarySearchTree#find_min" do
+	it "should return `nil` for new tree" do
+		t = BinarySearchTree.new
+		e = t.find_min
+		expect(e).to eql(nil)
+	end
+
+	it "should return element in root node" do
+		t = BinarySearchTree.root(3)
+		e = t.find_min
+		expect(e).to eql(3)
+	end
+
+	it "should remove element in left node" do
+		t = BinarySearchTree.root(5) { left(2) }
+		e = t.find_min
+		expect(e).to eql(2)
+	end
+
+	it "should remove element in left node of left node" do
+		t = BinarySearchTree.root(7) { left(5) { left(2) } }
+		e = t.find_min
+		expect(e).to eql(2)
+	end
+end
+
 describe "BinarySearchTree#member?" do
 	it "should return `false` for new tree" do
 		t = BinarySearchTree.new

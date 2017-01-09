@@ -3,13 +3,13 @@ dir = File.dirname(File.expand_path(__FILE__))
 require(File.join(dir, "base.rb"))
 
 class Memory
-	class Error < Exception
+	class Fault < Exception
 	end
 
 	class << self
 		def new(c)
 			if c < 0
-				raise Error.new("negative capacity: #{c}")
+				raise Fault.new("negative capacity: #{c}")
 			end
 			values = Array.new(c)
 			return Memory.__new__(values)
@@ -28,7 +28,7 @@ class Memory
 
 	def __assert_bounds(i)
 		if i < 0 || i >= capacity
-			raise Error.new("index out of bounds for capacity #{capacity}: #{i}")
+			raise Fault.new("index out of bounds for capacity #{capacity}: #{i}")
 		end
 		return
 	end

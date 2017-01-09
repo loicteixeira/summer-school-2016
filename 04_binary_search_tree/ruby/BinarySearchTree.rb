@@ -141,52 +141,51 @@ class BinarySearchTree
 		end
 	end
 
+	#
+	# This module defines utility methods.
+	#
+	## <>
 	module Util
 		class << self
 			#
-			# `replace`
-			#   returns node to replace `deleted_node`.
+			# `join`
+			#   joins subtrees `left_node` and `right_node`
+			#   and returns root node of the result, if any,
+			#   or `nil` otherwise.
 			#
 			# Write about 20 lines of code for this method.
 			#
-			## <E: ..Comparable<*/E>> Node<E> -> Node<E>?
-			def replace(deleted_node)
-				# Without left_node
-				if deleted_node.left_node.nil?
-					return deleted_node.right_node # Might be nil if no right_node
-
-				# With left_node
-				else
-					# left_node without right_node
-					if deleted_node.left_node.right_node.nil?
-						deleted_node.left_node.right_node = deleted_node.right_node
-						return deleted_node.left_node
-
-					# left_node with right_node
-					else
-						# left_node with right_node without right_node
-						if deleted_node.left_node.right_node.right_node.nil?
-							node = Node.new(deleted_node.left_node.right_node.e) {
-								left(deleted_node.left_node.e) { right(deleted_node.left_node.right_node.left_node.e)} # Should test `deleted_node.left_node.right_node.left_node.nil?` before accessing `e`
-								right(deleted_node.right_node.e) # Should test `deleted_node.right_node.nil?` before accessing `e`
-							}
-							return node
-
-						# left_node with right_node with right_node
-						else
-							node = Node.new(deleted_node.left_node.right_node.right_node.e) {
-								left(deleted_node.left_node.e) {
-									right(deleted_node.left_node.right_node.e) {
-										right(deleted_node.left_node.right_node.right_node.left_node.e) # Should test `deleted_node.left_node.right_node.right_node.left_node.nil?` before accessing `e`
-									}
-								}
-								right(deleted_node.right_node.e) # Should test `deleted_node.right_node.nil?` before accessing `e`
-							}
-							return node
-
-						end
-					end
+			## Node<E>?, Node<E>? -> Node<E>?
+			def join(left_node, right_node)
+				if left_node.nil?
+					return right_node
 				end
+				node = left_node.right_node
+				if node.nil?
+					left_node.right_node = right_node
+					return left_node
+				end
+				parent_node = left_node
+				while true
+					child_node = node.right_node
+					if child_node.nil?
+						parent_node.right_node = node.left_node
+						node.left_node = left_node
+						node.right_node = right_node
+						return node
+					end
+					parent_node = node
+					node = child_node
+				end
+			end
+
+			#
+			# `replace`
+			#   returns node to replace `node`.
+			#
+			## Node<E> -> Node<E>?
+			def replace(node)
+				return join(node.left_node, node.right_node)
 			end
 		end
 	end
@@ -280,33 +279,34 @@ class BinarySearchTree
 	#   t = BinarySearchTree.new
 	#   t.add(3)
 	#
-	# Write about 24 lines of code for this method.
+	# Write about 25 lines of code for this method.
 	#
 	## E -> void
 	def add(e)
-		unless @root_node
+		node = @root_node
+		if node.nil?
 			@root_node = Node.new(e)
 			return
 		end
-
-		node = @root_node
-		loop do
-			if e < node.e
-				if node.left_node
-					node = node.left_node
-				else
+		while true
+			if node.e == e
+				return
+			elsif node.e > e
+				left_node = node.left_node
+				if left_node.nil?
 					node.left_node = Node.new(e)
 					return
 				end
-			elsif e > node.e
-				if node.right_node
-					node = node.right_node
-				else
+				node = left_node
+			elsif node.e < e
+				right_node = node.right_node
+				if right_node.nil?
 					node.right_node = Node.new(e)
 					return
 				end
+				node = right_node
 			else
-				# Do nothing, `e` already exists.
+				raise RuntimeError
 			end
 		end
 	end
@@ -317,44 +317,110 @@ class BinarySearchTree
 	#
 	# Example:
 	#
-	#   t = BinarySearchTree.new
+	#   t = BinarySearchTree.root(2) { right(3) }
 	#   t.delete(3)
 	#
-	# Write about 31 lines of code for this method.
+	# Write about 30 lines of code for this method.
 	#
 	## E -> void
 	def delete(e)
-		return if @root_node.nil?
-
-		if e.eql? @root_node.e
-			@root_node = Util::replace(@root_node)
+		node = @root_node
+		if node.nil?
 			return
 		end
-
-		node = @root_node
-		loop do
-			if e < node.e
+		if node.e == e
+			@root_node = Util.replace(node)
+			return
+		end
+		while true
+			if node.e == e
+				raise RuntimeError
+			elsif node.e > e
 				left_node = node.left_node
-				return if left_node.nil?
-
-				if e.eql? left_node.e
-					node.left_node = Util::replace(left_node)
+				if left_node.nil?
 					return
 				end
-
+				if left_node.e == e
+					node.left_node = Util.replace(left_node)
+					return
+				end
 				node = left_node
-
-			elsif e > node.e
+			elsif node.e < e
 				right_node = node.right_node
-				return if right_node.nil?
-
-				if e.eql? right_node.e
-					node.right_node = Util::replace(right_node)
+				if right_node.nil?
 					return
 				end
-
+				if right_node.e == e
+					node.right_node = Util.replace(right_node)
+					return
+				end
 				node = right_node
+			else
+				raise RuntimeError
 			end
+		end
+	end
+
+	#
+	# `delete_min`
+	#   returns the smallest element, if any,
+	#   (and removes the element in that case)
+	#   or `nil` otherwise.
+	#
+	# Example:
+	#
+	#   t = BinarySearchTree.root(3) { left(2) }
+	#   t.delete_min # => 2
+	#
+	# Write about 20 lines of code for this method.
+	#
+	## -> E?
+	def delete_min
+		root_node = @root_node
+		if root_node.nil?
+			return nil
+		end
+		node = root_node.left_node
+		if node.nil?
+			@root_node = root_node.right_node
+			return root_node.e
+		end
+		parent_node = root_node
+		while true
+			child_node = node.left_node
+			if child_node.nil?
+				parent_node.left_node = node.right_node
+				return node.e
+			end
+			parent_node = node
+			node = child_node
+		end
+	end
+
+	#
+	# `find_min`
+	#   returns the smallest element, if any,
+	#   or `nil` otherwise.
+	#
+	# Example:
+	#
+	#   t = BinarySearchTree.root(3) { left(2) }
+	#   t.find_min # => 2
+	#
+	# Write about 10 lines of code for this method.
+	#
+	## -> E?
+	def find_min
+		node = @root_node
+		if node.nil?
+			return nil
+		end
+		while true
+			child_node = node.left_node
+			if child_node.nil?
+				return node.e
+			end
+			node = child_node
 		end
 	end
 
@@ -364,21 +430,23 @@ class BinarySearchTree
 	#
 	# Example:
 	#
-	#   t = BinarySearchTree.new
+	#   t = BinarySearchTree.root(2)
 	#   t.member?(3) # => false
 	#
-	# Write about 11 lines of code for this method.
+	# Write about 10 lines of code for this method.
 	#
 	## E -> boolean
 	def member?(e)
 		node = @root_node
-		while node
-			if e.eql?(node.e)
+		until node.nil?
+			if node.e == e
 				return true
-			elsif e < node.e
+			elsif node.e > e
 				node = node.left_node
-			else
+			elsif node.e < e
 				node = node.right_node
+			else
+				raise RuntimeError
 			end
 		end
 		return false
