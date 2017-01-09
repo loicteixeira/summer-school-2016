@@ -19,3 +19,8 @@ Summer School is a course in algorithms and data structures. The course is run v
   - [Implementation](../../compare/a03-src...a03-impl)
   - [Correction](../../compare/a03-src...a03-corr)
   - [Diff](../../compare/a03-impl...a03-corr) between my implementation and the correction
+4. Binary Search Tree
+  - [Source](../../commit/a04-src)
+  - [Implementation](../../compare/a04-src...a04-impl)
+  - [Correction](../../compare/a04-src...a04-corr)
+  - [Diff](../../compare/a04-impl...a04-corr) between my implementation and the correction
