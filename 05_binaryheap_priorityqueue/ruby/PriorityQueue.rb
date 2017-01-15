@@ -82,7 +82,9 @@ class PriorityQueue
 	#
 	## -> [K, V]?
 	def first
-		raise NotImplementedError
+		item = @h.first
+		return nil if item.nil?
+		return [item.k, item.v]
 	end
 
 	#
@@ -95,7 +97,9 @@ class PriorityQueue
 	#
 	## -> [K, V]?
 	def shift
-		raise NotImplementedError
+		item = @h.shift
+		return nil if item.nil?
+		return [item.k, item.v]
 	end
 
 	#
@@ -106,6 +110,8 @@ class PriorityQueue
 	#
 	## K, V -> void
 	def add(k, v)
-		raise NotImplementedError
+		item = Item.new(k, v)
+		@h.add(item)
+		return
 	end
 end

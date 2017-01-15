@@ -192,7 +192,8 @@ class BinaryHeap
 	#
 	## -> E?
 	def first
-		raise NotImplementedError
+		return nil if @n.zero?
+		return @m[0]
 	end
 
 	#
@@ -226,6 +227,7 @@ class BinaryHeap
 	#
 	## -> E?
 	def shift
+		return nil if @n.zero?
 		raise NotImplementedError
 	end
 end
