@@ -24,3 +24,8 @@ Summer School is a course in algorithms and data structures. The course is run v
   - [Implementation](../../compare/a04-src...a04-impl)
   - [Correction](../../compare/a04-src...a04-corr)
   - [Diff](../../compare/a04-impl...a04-corr) between my implementation and the correction
+5. Binary Heap & Priority Queue
+  - [Source](../../commit/a05-src)
+  - [(Partial) Implementation](../../compare/a05-src...a05-impl)
+  - [Correction](../../compare/a05-src...a05-corr)
+  - [Diff](../../compare/a05-impl...a05-corr) between my implementation and the correction
