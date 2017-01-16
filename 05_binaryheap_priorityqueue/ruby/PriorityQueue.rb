@@ -83,7 +83,9 @@ class PriorityQueue
 	## -> [K, V]?
 	def first
 		item = @h.first
-		return nil if item.nil?
+		if item.nil?
+			return nil
+		end
 		return [item.k, item.v]
 	end
 
@@ -98,7 +100,9 @@ class PriorityQueue
 	## -> [K, V]?
 	def shift
 		item = @h.shift
-		return nil if item.nil?
+		if item.nil?
+			return nil
+		end
 		return [item.k, item.v]
 	end
 

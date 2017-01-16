@@ -29,7 +29,22 @@ class BinaryHeap
 			#
 			## <E: ..Comparable<*/E>> Memory<E>, Integer, E -> Integer
 			def sift_up(m, j, e)
-				raise NotImplementedError
+				unless j >= 1
+					raise RuntimeError.new("expected j >= 1 but was #{j}")
+				end
+				while true
+					i = (j - 1) / 2
+					ei = m[i]
+					unless e < ei
+						break
+					end
+					m[j] = ei
+					j = i
+					if j == 0
+						break
+					end
+				end
+				return j
 			end
 
 			#
@@ -42,7 +57,43 @@ class BinaryHeap
 			#
 			## <E: ..Comparable<*/E>> Memory<E>, Integer, Integer, E -> Integer
 			def sift_down(m, n, i, e)
-				raise NotImplementedError
+				unless n >= 3
+					raise RuntimeError.new("expected n >= 3 but was #{n}")
+				end
+				j = i * 2 + 1
+				k = i * 2 + 2
+				ej = m[j]
+				while true
+					ek = m[k]
+					if ej < ek
+						if e <= ej
+							break
+						end
+						m[i] = ej
+						i = j
+					else
+						if e <= ek
+							break
+						end
+						m[i] = ek
+						i = k
+					end
+					j = i * 2 + 1
+					k = i * 2 + 2
+					if k > n
+						break
+					end
+					ej = m[j]
+					if k == n
+						if e <= ej
+							break
+						end
+						m[i] = ej
+						i = j
+						break
+					end
+				end
+				return i
 			end
 
 			#
@@ -55,7 +106,35 @@ class BinaryHeap
 			#
 			## <E: ..Comparable<*/E>> Memory<E>, Integer -> Integer
 			def sift_down_full(m, n)
-				raise NotImplementedError
+				unless n >= 3
+					raise RuntimeError.new("expected n >= 3 but was #{n}")
+				end
+				i = 0
+				j = 1
+				k = 2
+				ej = m[j]
+				while true
+					ek = m[k]
+					if ej < ek
+						m[i] = ej
+						i = j
+					else
+						m[i] = ek
+						i = k
+					end
+					j = i * 2 + 1
+					k = i * 2 + 2
+					if k > n
+						break
+					end
+					ej = m[j]
+					if k == n
+						m[i] = ej
+						i = j
+						break
+					end
+				end
+				return i
 			end
 		end
 	end
@@ -192,7 +271,9 @@ class BinaryHeap
 	#
 	## -> E?
 	def first
-		return nil if @n.zero?
+		if empty?
+			return nil
+		end
 		return @m[0]
 	end
 
@@ -209,7 +290,18 @@ class BinaryHeap
 	#
 	## E -> void
 	def add(e)
-		raise NotImplementedError
+		if full?
+			raise IndexError.new("heap is full")
+		end
+		n = @n
+		@n = n + 1
+		if n.zero?
+			@m[0] = e
+			return
+		end
+		i = Util.sift_up(@m, n, e)
+		@m[i] = e
+		return
 	end
 
 	#
@@ -227,7 +319,33 @@ class BinaryHeap
 	#
 	## -> E?
 	def shift
-		return nil if @n.zero?
-		raise NotImplementedError
+		if empty?
+			return nil
+		end
+		e = @m[0]
+		n = @n - 1
+		case n
+		when 0
+			# ...
+		when 1
+			@m[0] = @m[1]
+		when 2
+			e1 = @m[1]
+			e2 = @m[2]
+			if e1 < e2
+				@m[0] = e1
+				@m[1] = e2
+			else
+				@m[0] = e2
+			end
+		else
+			en = @m[n]
+#			i = Util.sift_down(@m, n, 0, en)
+			i = Util.sift_up(@m, Util.sift_down_full(@m, n), en)
+			@m[i] = en
+		end
+		@m[n] = nil
+		@n = n
+		return e
 	end
 end
