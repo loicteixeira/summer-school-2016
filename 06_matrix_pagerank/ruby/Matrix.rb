@@ -343,7 +343,9 @@ class Matrix
 	#
 	## Matrix -> Matrix
 	def __add(other)
-		raise NotImplementedError
+		Matrix::build(@row_count, @column_count) do |i, j|
+			self[i, j] + other[i, j]
+		end
 	end
 
 	## Matrix -> Matrix
@@ -369,7 +371,9 @@ class Matrix
 	#
 	## Matrix -> Matrix
 	def __sub(other)
-		raise NotImplementedError
+		Matrix::build(@row_count, @column_count) do |i, j|
+			self[i, j] - other[i, j]
+		end
 	end
 
 	## Matrix -> Matrix
@@ -394,7 +398,9 @@ class Matrix
 	#
 	## Numeric -> Matrix
 	def __mul_numeric(other)
-		raise NotImplementedError
+		Matrix::build(@row_count, @column_count) do |i, j|
+			self[i, j] * other
+		end
 	end
 
 	#
@@ -412,7 +418,9 @@ class Matrix
 	#
 	## Vector -> Vector
 	def __mul_vector(other)
-		raise NotImplementedError
+		Vector::MemoryVector::build(self.row_count) do |i|
+			other.inner_product(self.row(i))
+		end
 	end
 
 	#
@@ -430,7 +438,9 @@ class Matrix
 	#
 	## Matrix -> Matrix
 	def __mul_matrix(other)
-		raise NotImplementedError
+		Matrix::build(row_count, other.column_count) do |i, j|
+			self.row(i).inner_product other.column(j)
+		end
 	end
 
 	## Numeric -> Matrix
@@ -469,6 +479,8 @@ class Matrix
 	#
 	## -> Matrix
 	def transpose
-		raise NotImplementedError
+		Matrix::build(@column_count, @row_count) do |i, j|
+			self[j, i]
+		end
 	end
 end

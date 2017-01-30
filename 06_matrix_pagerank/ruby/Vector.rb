@@ -152,7 +152,9 @@ class Vector
 	#
 	## Vector -> Vector
 	def __add(other)
-		raise NotImplementedError
+		MemoryVector::build(size) do |i|
+			self[i] + other[i]
+		end
 	end
 
 	## Vector -> Vector
@@ -178,7 +180,9 @@ class Vector
 	#
 	## Vector -> Vector
 	def __sub(other)
-		raise NotImplementedError
+		MemoryVector::build(size) do |i|
+			self[i] - other[i]
+		end
 	end
 
 	## Vector -> Vector
@@ -203,7 +207,9 @@ class Vector
 	#
 	## Numeric -> Vector
 	def __mul_numeric(other)
-		raise NotImplementedError
+		MemoryVector::build(size) do |i|
+			self[i] * other
+		end
 	end
 
 	#
@@ -221,7 +227,9 @@ class Vector
 	#
 	## Matrix -> Vector
 	def __mul_matrix(other)
-		raise NotImplementedError
+		MemoryVector::build(other.column_count) do |j|
+			__inner_product(other.column(j))
+		end
 	end
 
 	## Numeric -> Vector
@@ -254,7 +262,11 @@ class Vector
 	#
 	## Vector -> Numeric
 	def __inner_product(other)
-		raise NotImplementedError
+		elements = Array.new(size)
+		size.times do |i|
+			elements[i] = self[i] * other[i]
+		end
+		elements.reduce(:+)
 	end
 
 	## Vector -> Numeric
@@ -278,6 +290,10 @@ class Vector
 	#
 	## -> Float
 	def magnitude
-		raise NotImplementedError
+		elements = Array.new(size)
+		size.times do |i|
+			elements[i] = self[i] * self[i]
+		end
+		Math::sqrt(elements.reduce(:+))
 	end
 end
