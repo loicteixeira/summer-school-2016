@@ -343,9 +343,12 @@ class Matrix
 	#
 	## Matrix -> Matrix
 	def __add(other)
-		Matrix::build(@row_count, @column_count) do |i, j|
-			self[i, j] + other[i, j]
-		end
+		m = Memory.new(@row_count) { |i|
+			Memory.new(@column_count) { |j|
+				@m[i][j] + other.__get(i, j)
+			}
+		}
+		return Matrix.__new__(m, @row_count, @column_count)
 	end
 
 	## Matrix -> Matrix
@@ -371,9 +374,12 @@ class Matrix
 	#
 	## Matrix -> Matrix
 	def __sub(other)
-		Matrix::build(@row_count, @column_count) do |i, j|
-			self[i, j] - other[i, j]
-		end
+		m = Memory.new(@row_count) { |i|
+			Memory.new(@column_count) { |j|
+				@m[i][j] - other.__get(i, j)
+			}
+		}
+		return Matrix.__new__(m, @row_count, @column_count)
 	end
 
 	## Matrix -> Matrix
@@ -398,9 +404,12 @@ class Matrix
 	#
 	## Numeric -> Matrix
 	def __mul_numeric(other)
-		Matrix::build(@row_count, @column_count) do |i, j|
-			self[i, j] * other
-		end
+		m = Memory.new(@row_count) { |i|
+			Memory.new(@column_count) { |j|
+				@m[i][j] * other
+			}
+		}
+		return Matrix.__new__(m, @row_count, @column_count)
 	end
 
 	#
@@ -418,9 +427,10 @@ class Matrix
 	#
 	## Vector -> Vector
 	def __mul_vector(other)
-		Vector::MemoryVector::build(self.row_count) do |i|
-			other.inner_product(self.row(i))
-		end
+		m = Memory.new(@row_count) { |i|
+			row(i).__inner_product(other)
+		}
+		return Vector::MemoryVector.__new__(m)
 	end
 
 	#
@@ -438,9 +448,12 @@ class Matrix
 	#
 	## Matrix -> Matrix
 	def __mul_matrix(other)
-		Matrix::build(row_count, other.column_count) do |i, j|
-			self.row(i).inner_product other.column(j)
-		end
+		m = Memory.new(@row_count) { |i|
+			Memory.new(other.column_count) { |j|
+				row(i).__inner_product(other.column(j))
+			}
+		}
+		return Matrix.__new__(m, @row_count, other.column_count)
 	end
 
 	## Numeric -> Matrix
@@ -479,8 +492,11 @@ class Matrix
 	#
 	## -> Matrix
 	def transpose
-		Matrix::build(@column_count, @row_count) do |i, j|
-			self[j, i]
-		end
+		m = Memory.new(@column_count) { |i|
+			Memory.new(@row_count) { |j|
+				@m[j][i]
+			}
+		}
+		return Matrix.__new__(m, @column_count, @row_count)
 	end
 end

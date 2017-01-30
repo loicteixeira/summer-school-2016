@@ -152,9 +152,10 @@ class Vector
 	#
 	## Vector -> Vector
 	def __add(other)
-		MemoryVector::build(size) do |i|
-			self[i] + other[i]
-		end
+		m = Memory.new(size) { |k|
+			__get(k) + other.__get(k)
+		}
+		return MemoryVector.__new__(m)
 	end
 
 	## Vector -> Vector
@@ -180,9 +181,10 @@ class Vector
 	#
 	## Vector -> Vector
 	def __sub(other)
-		MemoryVector::build(size) do |i|
-			self[i] - other[i]
-		end
+		m = Memory.new(size) { |k|
+			__get(k) - other.__get(k)
+		}
+		return MemoryVector.__new__(m)
 	end
 
 	## Vector -> Vector
@@ -207,9 +209,10 @@ class Vector
 	#
 	## Numeric -> Vector
 	def __mul_numeric(other)
-		MemoryVector::build(size) do |i|
-			self[i] * other
-		end
+		m = Memory.new(size) { |k|
+			__get(k) * other
+		}
+		return MemoryVector.__new__(m)
 	end
 
 	#
@@ -227,9 +230,10 @@ class Vector
 	#
 	## Matrix -> Vector
 	def __mul_matrix(other)
-		MemoryVector::build(other.column_count) do |j|
+		m = Memory.new(other.column_count) { |j|
 			__inner_product(other.column(j))
-		end
+		}
+		return MemoryVector.__new__(m)
 	end
 
 	## Numeric -> Vector
@@ -262,11 +266,11 @@ class Vector
 	#
 	## Vector -> Numeric
 	def __inner_product(other)
-		elements = Array.new(size)
-		size.times do |i|
-			elements[i] = self[i] * other[i]
+		t = 0
+		size.times do |k|
+			t += __get(k) * other.__get(k)
 		end
-		elements.reduce(:+)
+		return t
 	end
 
 	## Vector -> Numeric
@@ -290,10 +294,10 @@ class Vector
 	#
 	## -> Float
 	def magnitude
-		elements = Array.new(size)
-		size.times do |i|
-			elements[i] = self[i] * self[i]
+		t = 0.0
+		size.times do |k|
+			t += __get(k).abs2
 		end
-		Math::sqrt(elements.reduce(:+))
+		return Math.sqrt(t)
 	end
 end
