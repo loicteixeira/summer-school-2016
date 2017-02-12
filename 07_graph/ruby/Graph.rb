@@ -210,7 +210,20 @@ class Graph
 	#
 	## Integer, &{Integer -> void} -> void
 	def breadth_first_traversal(k)
-		raise NotImplementedError
+		__assert_bounds(k)
+		visited = Memory.new(size, false)
+		queue = Queue[k]
+		loop do
+			i = queue.shift
+			return if i.nil?
+			yield i
+			__each_edge(i) do |j|
+				unless visited[j]
+					visited[j] = true
+					queue.push(j)
+				end
+			end
+		end
 	end
 
 	#
@@ -231,7 +244,20 @@ class Graph
 	#
 	## Integer, &{Integer -> void} -> void
 	def depth_first_traversal(k)
-		raise NotImplementedError
+		__assert_bounds(k)
+		visited = Memory.new(size, false)
+		stack = Stack[k]
+		loop do
+			i = stack.shift
+			return if i.nil?
+			yield i
+			__reverse_each_edge(i) do |j|
+				unless visited[j]
+					visited[j] = true
+					stack.unshift(j)
+				end
+			end
+		end
 	end
 
 	#
