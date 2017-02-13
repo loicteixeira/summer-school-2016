@@ -212,18 +212,21 @@ class Graph
 	def breadth_first_traversal(k)
 		__assert_bounds(k)
 		visited = Memory.new(size, false)
-		queue = Queue[k]
-		loop do
-			i = queue.shift
-			return if i.nil?
+		q = Queue[k]
+		while true
+			i = q.shift
+			if i.nil?
+				break
+			end
 			yield i
 			__each_edge(i) do |j|
 				unless visited[j]
 					visited[j] = true
-					queue.push(j)
+					q.push(j)
 				end
 			end
 		end
+		return
 	end
 
 	#
@@ -246,18 +249,21 @@ class Graph
 	def depth_first_traversal(k)
 		__assert_bounds(k)
 		visited = Memory.new(size, false)
-		stack = Stack[k]
-		loop do
-			i = stack.shift
-			return if i.nil?
+		s = Stack[0]
+		while true
+			i = s.shift
+			if i.nil?
+				break
+			end
 			yield i
 			__reverse_each_edge(i) do |j|
 				unless visited[j]
 					visited[j] = true
-					stack.unshift(j)
+					s.unshift(j)
 				end
 			end
 		end
+		return
 	end
 
 	#
@@ -302,7 +308,37 @@ class Graph
 	#
 	## Memory<Symbol>, Integer -> boolean
 	def __cyclic_iterative?(label, k)
-		raise NotImplementedError
+		s = Stack[k]
+		while true
+			i = s.shift
+			if i.nil?
+				break
+			end
+			case label[i]
+			when :new
+				label[i] = :processing
+				s.unshift(i)
+				__reverse_each_edge(i) do |j|
+					case label[j]
+					when :new
+						s.unshift(j)
+					when :processing
+						return true
+					when :visited
+						# ...
+					else
+						raise RuntimeError.new
+					end
+				end
+			when :processing
+				label[i] = :visited
+			when :visited
+				# ...
+			else
+				raise RuntimeError.new
+			end
+		end
+		return false
 	end
 
 	#
@@ -313,7 +349,23 @@ class Graph
 	#
 	## Memory<Symbol>, Integer -> boolean
 	def __cyclic_recursive?(label, i)
-		raise NotImplementedError
+		label[i] = :processing
+		__each_edge(i) do |j|
+			case label[j]
+			when :new
+				if __cyclic_recursive?(label, j)
+					return true
+				end
+			when :processing
+				return true
+			when :visited
+				# ...
+			else
+				raise RuntimeError.new
+			end
+		end
+		label[i] = :visited
+		return false
 	end
 
 	#
@@ -356,7 +408,38 @@ class Graph
 	#
 	## Memory<Symbol>, Integer, &{Integer -> void} -> void
 	def __topological_sort_iterative(label, k)
-		raise NotImplementedError
+		s = Stack[k]
+		while true
+			i = s.shift
+			if i.nil?
+				break
+			end
+			case label[i]
+			when :new
+				label[i] = :processing
+				s.unshift(i)
+				__reverse_each_edge(i) do |j|
+					case label[j]
+					when :new
+						s.unshift(j)
+					when :processing
+						raise CyclicError.new
+					when :visited
+						# ...
+					else
+						raise RuntimeError.new
+					end
+				end
+			when :processing
+				label[i] = :visited
+				yield i
+			when :visited
+				# ...
+			else
+				raise RuntimeError.new
+			end
+		end
+		return
 	end
 
 	#
@@ -367,6 +450,21 @@ class Graph
 	#
 	## Memory<Symbol>, Integer, &{Integer -> void} -> void
 	def __topological_sort_recursive(label, i, &block)
-		raise NotImplementedError
+		label[i] = :processing
+		__each_edge(i) do |j|
+			case label[j]
+			when :new
+				__topological_sort_recursive(label, j, &block)
+			when :processing
+				raise CyclicError.new
+			when :visited
+				# ...
+			else
+				raise RuntimeError.new
+			end
+		end
+		label[i] = :visited
+		yield i
+		return
 	end
 end
