@@ -32,8 +32,17 @@ module Algorithms
 		#
 		## <E: ..Object?> Random, Memory<E> -> Memory<E>
 		def shuffle(r, m0)
-			raise NotImplementedError
-		end
+			n = m0.capacity
+			m1 = Memory.new(n)
+
+			n.times do |i|
+				j = r.rand(i + 1)
+				m1[i] = m1[j] if i != j
+				m1[j] = m0[i]
+			end
+
+			return m1
+ 		end
 
 		#
 		# `shuffle!`
@@ -49,8 +58,11 @@ module Algorithms
 		#
 		## <E: ..Object?> Random, Memory<E> -> void
 		def shuffle!(r, m)
-			raise NotImplementedError
-			return
+			n = m.capacity - 1
+			n.downto 0 do |i|
+				j = r.rand(i + 1)
+				swap(m, j, i) if i != j
+			end
 		end
 
 		#
@@ -66,7 +78,20 @@ module Algorithms
 		#
 		## <E: ..Comparable<*/E>> Memory<E>, E -> boolean
 		def binary_search(m, e)
-			raise NotImplementedError
+			l, r = 0, m.capacity - 1
+
+			loop do
+				return false if l > r
+
+				i = (l + r) / 2
+				return true if m[i] == e
+
+				if m[i] < e
+					l = i + 1
+				else
+					r = i - 1
+				end
+			end
 		end
 
 		#
@@ -82,7 +107,28 @@ module Algorithms
 		#
 		## <E: ..Object?> Memory<E> -> Memory<Integer>
 		def kmp_table(word)
-			raise NotImplementedError
+			n = word.capacity
+			t = Memory.new(n)
+			pos = 2
+			i = 0
+
+			t[0] = nil
+			t[1] = 0
+
+			while pos < n do
+				if word[pos - 1] == word[i]
+					t[pos] = i + 1
+					i += 1
+					pos += 1
+				elsif i > 0
+					i = t[i]
+				else
+					t[pos] = 0
+					pos += 1
+				end
+			end
+
+			return t
 		end
 
 		#
@@ -98,8 +144,25 @@ module Algorithms
 		# Write about 20 lines of code for this method.
 		#
 		## <E: ..Object?> Memory<E>, Memory<E>, &{Integer -> void} -> void
-		def kmp_search(word, m)
-			raise NotImplementedError
+		def kmp_search(word, string)
+			m = 0
+			i = 0
+			t = kmp_table(word)
+
+			while m + i < string.capacity do
+				if word[i] == string[m + i]
+					yield m if i == word.capacity - 1
+					i += 1
+				else
+					unless t.nil?
+						m += 1
+						i = 0
+					else
+						m = m + i - t[i]
+						i = t[i]
+					end
+				end
+			end
 		end
 	end
 end
