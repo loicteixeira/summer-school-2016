@@ -34,15 +34,15 @@ module Algorithms
 		def shuffle(r, m0)
 			n = m0.capacity
 			m1 = Memory.new(n)
-
-			n.times do |i|
-				j = r.rand(i + 1)
-				m1[i] = m1[j] if i != j
-				m1[j] = m0[i]
+			n.times do |j|
+				i = r.rand(j + 1)
+				if i != j
+					m1[j] = m1[i]
+				end
+				m1[i] = m0[j]
 			end
-
 			return m1
- 		end
+		end
 
 		#
 		# `shuffle!`
@@ -58,11 +58,15 @@ module Algorithms
 		#
 		## <E: ..Object?> Random, Memory<E> -> void
 		def shuffle!(r, m)
-			n = m.capacity - 1
-			n.downto 0 do |i|
-				j = r.rand(i + 1)
-				swap(m, j, i) if i != j
+			j = m.capacity
+			while j > 1
+				i = r.rand(j)
+				j -= 1
+				if i != j
+					swap(m, i, j)
+				end
 			end
+			return
 		end
 
 		#
@@ -78,20 +82,22 @@ module Algorithms
 		#
 		## <E: ..Comparable<*/E>> Memory<E>, E -> boolean
 		def binary_search(m, e)
-			l, r = 0, m.capacity - 1
-
-			loop do
-				return false if l > r
-
-				i = (l + r) / 2
-				return true if m[i] == e
-
-				if m[i] < e
-					l = i + 1
+			i = 0
+			j = m.capacity
+			while i < j
+				k = (i + j) / 2
+				ek = m[k]
+				if ek == e
+					return true
+				elsif ek > e
+					j = k
+				elsif ek < e
+					i = k + 1
 				else
-					r = i - 1
+					raise RuntimeError.new("incomparable: #{ek} <=> #{e}")
 				end
 			end
+			return false
 		end
 
 		#
@@ -108,27 +114,26 @@ module Algorithms
 		## <E: ..Object?> Memory<E> -> Memory<Integer>
 		def kmp_table(word)
 			n = word.capacity
-			t = Memory.new(n)
-			pos = 2
+			unless n >= 2
+				raise ArgumentError.new("expected n >= 2 but was #{n}")
+			end
+			table = Memory.new(n)
+			table[1] = 0
 			i = 0
-
-			t[0] = nil
-			t[1] = 0
-
-			while pos < n do
-				if word[pos - 1] == word[i]
-					t[pos] = i + 1
+			j = 1
+			while j + 1 < n
+				if word[i].eql?(word[j])
 					i += 1
-					pos += 1
-				elsif i > 0
-					i = t[i]
+					j += 1
+					table[j] = i
+				elsif i != 0
+					i = table[i]
 				else
-					t[pos] = 0
-					pos += 1
+					j += 1
+					table[j] = i
 				end
 			end
-
-			return t
+			return table
 		end
 
 		#
@@ -144,25 +149,26 @@ module Algorithms
 		# Write about 20 lines of code for this method.
 		#
 		## <E: ..Object?> Memory<E>, Memory<E>, &{Integer -> void} -> void
-		def kmp_search(word, string)
-			m = 0
+		def kmp_search(word, m)
+			n = word.capacity
+			table = kmp_table(word)
 			i = 0
-			t = kmp_table(word)
-
-			while m + i < string.capacity do
-				if word[i] == string[m + i]
-					yield m if i == word.capacity - 1
+			j = 0
+			while j < m.capacity
+				if word[i].eql?(m[j])
+					j += 1
 					i += 1
-				else
-					unless t.nil?
-						m += 1
+					if i == n
+						yield j - n
 						i = 0
-					else
-						m = m + i - t[i]
-						i = t[i]
 					end
+				elsif i != 0
+					i = table[i]
+				else
+					j += 1
 				end
 			end
+			return
 		end
 	end
 end
