@@ -188,7 +188,32 @@ class WeightedGraph
 	#
 	## Integer, &{Integer, Float -> void} -> void
 	def dijkstra(k)
-		raise NotImplementedError
+		__assert_bounds(k)
+		items = Memory.new(size)
+		q = BinaryHeap.new(size)
+		size.times do |i|
+			e = NodeItem.new(i == k ? 0.0 : Float::INFINITY, i)
+			items[i] = e
+			q.add(e)
+		end
+		while true
+			ei = q.shift
+			if ei.nil?
+				break
+			end
+			i = ei.i
+			di = ei.priority
+			yield i, di
+			__each_edge(i) do |j, w|
+				ej = items[j]
+				dj = di + w
+				if dj < ej.priority
+					ej.priority = dj
+					q.sift_up(ej)
+				end
+			end
+		end
+		return
 	end
 
 	#
@@ -212,7 +237,17 @@ class WeightedGraph
 	#
 	## -> Memory<Memory<Float>>
 	def adjacency_matrix
-		raise NotImplementedError
+		m = Memory.new(size) { |i|
+			Memory.new(size) { |j|
+				i == j ? 0.0 : Float::INFINITY
+			}
+		}
+		size.times do |i|
+			__each_edge(i) do |j, w|
+				m[i][j] = w
+			end
+		end
+		return m
 	end
 
 	#
@@ -237,7 +272,18 @@ class WeightedGraph
 	#
 	## -> Memory<Memory<Float>>
 	def floyd_warshall
-		raise NotImplementedError
+		m = adjacency_matrix
+		size.times do |k|
+			size.times do |i|
+				size.times do |j|
+					d = m[i][k] + m[k][j]
+					if d < m[i][j]
+						m[i][j] = d
+					end
+				end
+			end
+		end
+		return m
 	end
 
 	## <>
@@ -273,6 +319,40 @@ class WeightedGraph
 	#
 	## Integer, &{Integer, Integer -> void} -> void
 	def prim(k)
-		raise NotImplementedError
+		items = Memory.new(size)
+		q = BinaryHeap.new(size)
+		size.times do |i|
+			e = EdgeItem.new(Float::INFINITY, i)
+			items[i] = e
+			if i != k
+				q.add(e)
+			end
+		end
+		j = k
+		__each_edge(j) do |i, w|
+			ei = items[i]
+			ei.priority = w
+			ei.j = j
+			q.sift_up(ei)
+		end
+		while true
+			e = q.shift
+			if e.nil?
+				break
+			end
+			yield [e.j, e.i]
+			j = e.i
+			__each_edge(j) do |i, w|
+				ei = items[i]
+				unless ei.index.nil?
+					if w < ei.priority
+						ei.priority = w
+						ei.j = j
+						q.sift_up(ei)
+					end
+				end
+			end
+		end
+		return
 	end
 end
